@@ -1,18 +1,32 @@
 import Axios from "axios"
 import React, { useEffect, useState } from "react"
-import { useParams } from "react-router-dom"
+import { useParams, Redirect } from "react-router-dom"
 import UserImages from "../containers/UserImages"
 import axios from "axios"
 
 export default () => {
-  const {id} = useParams()
+  const {id} = useParams() // This will be "me" or any id
+  if (id == "me" && !localStorage.getItem("token")) {
+    return <Redirect to="/" />
+  }
   const [user, setUser] = useState({})
 
   useEffect(() => {
-    axios.get("https://insta.nextacademy.com/api/v1/users/" + id)
+    if (id == "me") {
+      axios.get("https://insta.nextacademy.com/api/v1/users/me", {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token")
+        }
+      })
+      .then((response)=>{
+        setUser({...response.data, profileImage: response.data.profile_picture})
+      })
+    } else {
+      axios.get("https://insta.nextacademy.com/api/v1/users/" + id)
       .then((response)=>{
         setUser(response.data)
       })
+    }
   }, [])
   return (
     <div>
