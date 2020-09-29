@@ -6,13 +6,12 @@ import axios from "axios"
 
 export default () => {
   const {id} = useParams() // This will be "me" or any id
-  if (id == "me" && !localStorage.getItem("token")) {
-    return <Redirect to="/" />
-  }
   const [user, setUser] = useState({})
 
   useEffect(() => {
-    if (id == "me") {
+    if (id == "me" && !localStorage.getItem("token")) {
+      return <Redirect to="/" />
+    } else if (id == "me") {
       axios.get("https://insta.nextacademy.com/api/v1/users/me", {
         headers: {
           Authorization: "Bearer " + localStorage.getItem("token")
@@ -27,16 +26,39 @@ export default () => {
         setUser(response.data)
       })
     }
-  }, [])
+  }, [id])
+
+  const handleFileChange = (e) => {
+    const fileInput = e.target
+    const formData = new FormData()
+    formData.append("image", e.target.files[0])
+    axios.post("https://insta.nextacademy.com/api/v1/images/", formData, {headers: {
+      Authorization: "Bearer " + localStorage.getItem("token")
+    }})
+    .then(() => {
+      fileInput.value = null
+      const userCopy = {...user}
+      setUser({})
+      setUser(userCopy)
+    })
+  }
+
   return (
     <div>
-      <div>
-        <img src={user.profileImage} width="200"/>
-        <p>{user.username}</p>
-      </div>
-      <div>
-        <UserImages userId={id}/>
-      </div>
+      {
+        user.id ? 
+        <>
+          <div>
+            <img src={user.profileImage} width="200"/>
+            <p>{user.username}</p>
+          </div>
+          <div>
+            <input type="file" onChange={handleFileChange} />
+            <UserImages userId={user.id}/>
+          </div> 
+        </> : 
+        null
+      }
     </div>
   )
 }

@@ -9,7 +9,7 @@ export default ({userId}) => {
 		.then((response) => {
 			setImages(response.data)
 		})
-	}, [])
+	}, [userId])
 
 	return (
 		<div style={{padding: "5%", display: "flex", justifyContent: "center", alignContent: "center", flexWrap: "wrap"}}>
