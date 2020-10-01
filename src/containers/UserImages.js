@@ -1,9 +1,11 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import axios from 'axios'
 import Likes from './Likes'
 import Comments from './Comments'
+import SessionContext from '../contexts/SessionContext'
 
 export default ({userId}) => {
+	const {isLoggedIn} = useContext(SessionContext)
 	const [images, setImages] = useState([])
 
 	useEffect(() => {
@@ -20,8 +22,14 @@ export default ({userId}) => {
 					return (
 						<div>
 							<img height={200} src={image.url}/>
-							<Likes imageId={image.id} />
-							<Comments imageId={image.id} />
+							{
+								isLoggedIn ?
+								<>
+									<Likes imageId={image.id} />
+									<Comments imageId={image.id} />
+								</> :
+								null
+							}
 						</div>
 						)
 				})

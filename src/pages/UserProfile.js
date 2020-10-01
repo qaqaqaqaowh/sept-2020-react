@@ -1,17 +1,17 @@
 import Axios from "axios"
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState, useContext } from "react"
 import { useParams, Redirect } from "react-router-dom"
 import UserImages from "../containers/UserImages"
 import axios from "axios"
+import SessionContext from '../contexts/SessionContext'
 
 export default () => {
+  const {isLoggedIn} = useContext(SessionContext)
   const {id} = useParams() // This will be "me" or any id
   const [user, setUser] = useState({})
-
+  
   useEffect(() => {
-    if (id == "me" && !localStorage.getItem("token")) {
-      return <Redirect to="/" />
-    } else if (id == "me") {
+    if (id == "me") {
       axios.get("https://insta.nextacademy.com/api/v1/users/me", {
         headers: {
           Authorization: "Bearer " + localStorage.getItem("token")
@@ -27,6 +27,10 @@ export default () => {
       })
     }
   }, [id])
+
+  if (!isLoggedIn || (id == "me" && !localStorage.getItem("token"))) {
+    return <Redirect to="/" />
+  }
 
   const handleFileChange = (e) => {
     const fileInput = e.target

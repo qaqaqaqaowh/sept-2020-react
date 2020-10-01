@@ -1,4 +1,5 @@
 import React, {useState} from 'react'
+import SessionContext from '../contexts/SessionContext'
 import SignUp from './SignUp'
 import Login from './Login'
 
@@ -15,9 +16,10 @@ const modalContainerStyle = {
 	justifyContent: "center"
 }
 
-export default ({setLogin}) => {
+export default ({children}) => {
 	const [isOpen, setOpen] = useState(false)
 	const [isLoginForm, setIsLoginForm] = useState(true)
+	const [isLoggedIn, setLogin] = useState(localStorage.getItem("token"))
 
 	const open = () => {
 		setOpen(true)
@@ -46,24 +48,25 @@ export default ({setLogin}) => {
 	}
 
 	const renderContent = () => {
-		if (isOpen) {
-			return (
-				<div style={modalContainerStyle}>
-					<div style={modalStyle}>
-						{renderForm()}
-						<button onClick={() => close()}>X</button>
-					</div>
-				</div>
-			)
-		}
+		return (
+			<SessionContext.Provider value={{openLogin, openSignUp, close, isLoggedIn, setLogin}}>
+				{
+					isOpen ?
+					<div style={modalContainerStyle}>
+						<div style={modalStyle}>
+							{renderForm()}
+							<button onClick={() => close()}>X</button>
+						</div>
+					</div> :
+					null
+				}
+				{children}
+			</SessionContext.Provider>
+		)
 	}
 
 	return (
-		<>
-			{renderContent()}
-			<button onClick={openSignUp}>Sign Up</button>
-			<button onClick={openLogin}>Login</button>
-		</>
+		renderContent()
 	)
 }
 

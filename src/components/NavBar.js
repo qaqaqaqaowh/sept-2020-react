@@ -1,11 +1,11 @@
-import React, {useState} from 'react'
+import React, {useState, useContext} from 'react'
 import {Link} from "react-router-dom"
 import Modal from '../containers/Modal'
-
+import SessionContext from '../contexts/SessionContext'
 
 export default () => {
-	const [loggedIn, setLogin] = useState(localStorage.getItem("token"))
-	
+	const {openLogin, openSignUp, isLoggedIn, setLogin} = useContext(SessionContext)
+
 	const handleLogout = () => {
 		localStorage.removeItem("token")
 		setLogin(false)
@@ -16,12 +16,16 @@ export default () => {
 		  <h2>Navbar</h2>
 		  <Link to="/" >Home</Link>
 		  {
-		  	localStorage.getItem("token") ?
+		  	isLoggedIn ?
 		  	<Link to="/users/me" >Profile</Link>
 		  	: null
 		  }
 		  {
-		  	loggedIn ? <button onClick={handleLogout}>Logout</button> : <Modal setLogin={setLogin}/>
+		  	isLoggedIn ? <button onClick={handleLogout}>Logout</button> : 
+		  	<>
+		  		<button onClick={openSignUp}>Sign Up</button>
+		  		<button onClick={openLogin}>Login</button>
+		  	</>
 		  }
 		</div>
 	)
